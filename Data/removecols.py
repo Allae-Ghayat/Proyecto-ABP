@@ -1,3 +1,5 @@
+#Script para borrar de un csv determinadas columnas, genera otro de salida, no modifica el de entrada
+
 import csv
 
 input_file = input("Introduce el archivo de entrada")
