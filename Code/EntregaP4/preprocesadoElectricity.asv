@@ -1,0 +1,15 @@
+function [x, y] = preprocesadoElectricity()
+    %cargamos los datos del excel
+    elect = readtable('train.csv');
+
+    elect.datetime = grp2idx(datenum(string(elect.datetime),"yyyy-mm-dd HH:MM:SS"));
+    t = table2array(elect);
+    disp(t(:,2));
+    disp
+%     x = t(:,2:end-1)';
+%     disp(x(1,:));
+%     y = t(:,end)';
+%     
+%     x(2:end,:)= normalize(x(2:end,:));
+
+end 
