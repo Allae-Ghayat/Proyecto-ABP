@@ -1,0 +1,16 @@
+[xw, yw] = preprocesadoElectricity("train.csv");
+[xw,yw] = shuffle(xw,yw);
+    
+xtrn = xw(:,1:m);     ytrn = yw(1:m);
+xtst = xw(:,m+1:end); ytst = yw(m+1:end);
+
+    
+net = newff(minmax(xtrn),[2 1],{'tansig' 'purelin'},'traingd');
+% traingd traingdm traingda trainlm
+net.trainParam.epochs = 100;
+net.trainParam.goal = 0.01;
+net = train(net,xtrn,ytrn);
+y2 = sim(net,xtrn);
+plot(xtrain,ytrain,'o'), hold on, plot(xtrain,y2,'xr')
+y2 = sim(net,xtst);
+figure, plot(xtrain,ytrain,'or'), hold on, plot(xtst,ytst,'.k'), plot(xtst,y2,'xr');

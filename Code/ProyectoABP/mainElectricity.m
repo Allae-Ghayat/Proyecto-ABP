@@ -45,9 +45,10 @@
             row = xtst(i,:);
             output = forward_propagation(net, row);
             y_predict = [y_predict find(output == max(output))];
+            disp("------- "+i+" -------");
         end
-
         tasa_acierto(epoch)=sum(y_predict==ytst)/length(ytst)*100;
+        disp("------- "+epoch+" ---- "+tasa_acierto(epoch)+" -------");
     end
     
     figure, plot(1:100,tasa_acierto,'r');
