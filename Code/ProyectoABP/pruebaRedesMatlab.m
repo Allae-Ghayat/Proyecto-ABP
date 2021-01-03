@@ -19,3 +19,6 @@ y2 = sim(net,xtst);
 figure, plot(xtrn,ytrn,'or'), hold on, plot(xtst,ytst,'.k'), plot(xtst,y2,'xr');
 
 tasa_acierto = sum(y2==ytst)/length(ytst)*100;
+
+
+
