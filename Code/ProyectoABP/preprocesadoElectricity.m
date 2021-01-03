@@ -5,7 +5,7 @@ function [x, y] = preprocesadoElectricity(archivo)
     %Separamos en un array de 2 posiciones la parte referente a fecha y
     %hora del campo datetime, realizamos esto para que la red pueda
     %aprender en base a la hora y fecha de forma separada, ya que aunque
-    %sean fechas diferentes, a la misma ahora puede haber consumos
+    %sean fechas diferentes, a la misma hora puede haber consumos
     %parecidos.
      datearray = split(cellstr(elect.datetime)," ");
      %guardamos cada campo en un vector diferente
@@ -41,6 +41,7 @@ function [x, y] = preprocesadoElectricity(archivo)
      %normalizamos las características, fecha y hora nno la normalizamos ya
      %que perderian su significado, ya que cada número representa
      %exactamente una fecha y hora
-      x(3:end,:)= normalize(x(3:end,:));
+     
+     %x(3:end,:)= normalize(x(3:end,:));
 
 end 

@@ -7,8 +7,8 @@
     %[xtst, ytst] = preprocesadoElectricity("test.csv");
 
     [n_inputs,~] = size(xw);    % tantas entradas como patrones
-    n_outputs = 1;        % 3 clases de vino
-    n_ocultas = 4;              % dos neuronas en la capa oculta
+    n_outputs = 1;        
+    n_ocultas = 2;              % dos neuronas en la capa oculta
     network = initialize_network(n_inputs, n_ocultas, n_outputs);
 
     epoch = 100;
@@ -47,6 +47,8 @@
             y_predict = [y_predict find(output == max(output))];
             disp("------- "+i+" -------");
         end
+        disp(y_predict);
+        pause;
         tasa_acierto(epoch)=sum(y_predict==ytst)/length(ytst)*100;
         disp("------- "+epoch+" ---- "+tasa_acierto(epoch)+" -------");
     end
