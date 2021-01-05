@@ -1,0 +1,11 @@
+numpy==1.19.3
+pandas
+matplotlib
+tensorflow
+sklearn
+datetime
+time
+keras
+operator
+
+
