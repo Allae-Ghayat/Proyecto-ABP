@@ -83,8 +83,6 @@ df_train['Quarter'] = [date.quarter for date in df_train.datetime]
 #df_test['var2A'].fillna(0, inplace=True)
 #df_test['var2B'].fillna(0, inplace=True)
 
-
-print("ANTES DATETOUNIX \n")
 # Creating X_test
 X_test = datetounix(df_test).drop(['ID'], axis=1).values
 
@@ -99,7 +97,7 @@ X = df_train_features.values
 y = df_train['electricity_consumption'].values
 
 #--visualisation of features
-print("ANTES TREESCLASSIFIER \n")
+
 # create an instance for tree feature selection
 tree_clf = ExtraTreesClassifier()
 
@@ -131,7 +129,7 @@ tree_clf = ExtraTreesClassifier()
 #plt.show()
 
 ############ Data Scaling ###################
-print("ANTES DATASCALING \n")
+
 sc = StandardScaler()
 X = sc.fit_transform(X)
 
@@ -151,29 +149,28 @@ maxy = max(Y_train)
 
 y_norm = (Y_train - miny)/(maxy - miny)
 #y_norm
-print("DESPUÉS DATASCALING \n")
+
 #--IMPLEMENTACIÓN RED
 
-
-print("ANTES ANN \n")
 # Initialising the ANN
 classifier = Sequential()
 
 # Adding the input layer and the first hidden layer
-classifier.add(Dense(units = 10, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+classifier.add(Dense(units = 12,activation = 'relu', input_dim = 11))
 
 # Adding the second hidden layer
-classifier.add(Dense(units = 5, kernel_initializer = 'uniform', activation = 'relu'))
+classifier.add(Dense(units = 6, activation = 'relu'))
 
 # Adding the output layer
-classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+classifier.add(Dense(units = 1, activation = 'linear'))
 
 # Compiling the ANN
-classifier.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics = ['mae'])
+classifier.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # Fitting the ANN to the training set
 classifier.fit(X_train, y_norm, batch_size = 10, epochs = 100)
-print("DESPUES DATASCALING \n")
+
+
 # Part 3 - Making the predictions and evaluating the model
 
 # Predicting the Test set results
@@ -183,16 +180,6 @@ y_pred = classifier.predict(X_test)
 
 y_pred = (y_pred * (maxy - miny)) + miny
 
-np.savetxt("yout.txt",y_pred)
+np.savetxt("yout5.txt",y_pred)
 
-predictions = [int(elem) for elem in y_pred]
-
-df_solution = pd.DataFrame()
-df_solution['ID'] = df_test.ID
-
-# Prepare Solution dataframe
-df_solution['electricity_consumption'] = predictions
-df_solution['electricity_consumption'].unique()
-
-print("HOLA")
-df_solution
+predictions = np.array([int(elem) for elem in y_pred])
