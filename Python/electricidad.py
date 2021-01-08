@@ -74,53 +74,69 @@ df_train_features = df_train.drop(['electricity_consumption', 'ID'], axis=1)
 df_train_features = datetounix(df_train_features)
 
 # store features in X array
-X = df_train_features.values
-y = df_train['electricity_consumption'].values
+X_train = df_train_features.values
+y_train = df_train['electricity_consumption'].values
 
 
 ############ Data Scaling ###################
 
 sc = StandardScaler()
-X = sc.fit_transform(X)
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
 
-#X_test = sc.transform(X_test)
+miny = min(y_train)
+maxy = max(y_train)
 
-miny = min(y)
-maxy = max(y)
-
-y_norm = (y - miny)/(maxy - miny)
+y_normtrain = (y_train - miny)/(maxy - miny)
 
 # Initialising the ANN
-classifier = Sequential()
+def baseline_model():
+	classifier = Sequential()
+	# Adding the input layer and the first hidden layer
+	classifier.add(Dense(11, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
 
-# Adding the input layer and the first hidden layer
-classifier.add(Dense(units = 11, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+	classifier.add(Dense(6, kernel_initializer='uniform', activation='relu'))
+	# Adding the output layer
+	classifier.add(Dense(1, kernel_initializer = 'uniform',activation='sigmoid'))
 
-# Adding the second hidden layer
-classifier.add(Dense(units = 5, kernel_initializer = 'uniform', activation = 'relu'))
+	# Compiling the ANN
+	classifier.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
-# Adding the output layer
-classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
-
-# Compiling the ANN
-classifier.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics = ['mae'])
-
+	return classifier
 # Fitting the ANN to the training set
-classifier.fit(X, y, batch_size = 10, epochs = 100)
+from keras.wrappers.scikit_learn import KerasRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+
+estimator=KerasRegressor(build_fn=baseline_model,epochs=100,batch_size=10,verbose=0)
+
+kfold = KFold(n_splits=10)
+results = cross_val_score(estimator, X_train, y_normtrain, cv=kfold)
+print("Baseline: %.2f (%.2f) MSE" % (results.mean(), results.std()))
 
 # Part 3 - Making the predictions and evaluating the model
 
 # Predicting the Test set resultsy_pred = classifier.predict(X_test)
 
+estimator.fit(X_train, y_normtrain)
+prediction = estimator.predict(X_test)
+
+print("prediction=")
+print(prediction)
+
+#accuracy_score(Y_test, prediction)
 
 
+preddesnorm = (prediction * (maxy - miny)) + miny
+print("pred desnorm=")
+print(preddesnorm)
+np.savetxt("ydesnorm.txt",preddesnorm)
+np.savetxt("ypred.txt",predictions)
 
-y_pred = (y_pred * (maxy - miny)) + miny
+predictions = np.array([int(elem) for elem in preddesnorm])
 
-np.savetxt("yout.txt",y_pred)
 
-predictions = np.array([int(elem) for elem in y_pred])
-
+"""
 df_solution = pd.DataFrame()
 df_solution['ID'] = df_test.ID
 
@@ -133,3 +149,4 @@ df_solution['electricity_consumption'].unique()
 #compare.loc[(compare['Day']==1) & (compare['Month']==7) & (compare['Year']==2013)]
 #plt.plot(predictions)
 #plt.show()
+"""
