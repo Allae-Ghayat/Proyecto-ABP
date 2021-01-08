@@ -43,6 +43,8 @@ del(df_test['var1'])
 del(df_test['var2'])
 #--data cleaning
 
+
+
 df_train['datetime'] = pd.to_datetime(df_train['datetime'])
 df_test['datetime'] = pd.to_datetime(df_test['datetime'])
 #df_test.info()
@@ -65,23 +67,7 @@ df_train['Time'] = [((date.hour*60+(date.minute))*60)+date.second for date in df
 df_train['Week'] = [date.week for date in df_train.datetime]
 df_train['Quarter'] = [date.quarter for date in df_train.datetime]
 
-#--data preparation
 
-# Create Dummy Variables for Train set
-#df_train.loc[df_train.var2 == 'A', 'var2A'] = 1
-#df_train.loc[df_train.var2 == 'B', 'var2B'] = 1
-
-#df_train['var2A'].fillna(0, inplace=True)
-#df_train['var2B'].fillna(0, inplace=True)
-
-#df_train.drop(['var2'], axis=1, inplace=True)
-
-# Create Dummy Variables for Test set
-#df_test.loc[df_test.var2 == 'A', 'var2A'] = 1
-#df_test.loc[df_test.var2 == 'B', 'var2B'] = 1
-
-#df_test['var2A'].fillna(0, inplace=True)
-#df_test['var2B'].fillna(0, inplace=True)
 
 # Creating X_test
 X_test = datetounix(df_test).drop(['ID'], axis=1).values
@@ -95,59 +81,19 @@ df_train_features = datetounix(df_train_features)
 # store features in X array
 X = df_train_features.values
 y = df_train['electricity_consumption'].values
-
-#--visualisation of features
-
-# create an instance for tree feature selection
+#AQUI
 tree_clf = ExtraTreesClassifier()
-
-# fit the model
-#tree_clf.fit(X, y)
-
-# Preparing variables
-#importances = tree_clf.feature_importances_
-#feature_names = df_train_features.columns.tolist()
-
-#feature_imp_dict = dict(zip(feature_names, importances))
-#sorted_features = sorted(feature_imp_dict.items(), key=operator.itemgetter(1), reverse=True)
-
-#indices = np.argsort(importances)[::-1]
-
-# Print the feature ranking
-#print("Feature ranking:")
-
-#for f in range(X.shape[1]):
-#    print("feature %d : %s (%f)" % (indices[f], sorted_features[f][0], sorted_features[f][1]))
-
-# Plot the feature importances of the forest
-#plt.figure(0)
-#plt.title("Feature importances")
-#plt.bar(range(X.shape[1]), importances[indices],
-#       color="r", align="center")
-#plt.xticks(range(X.shape[1]), indices)
-#plt.xlim([-1, X.shape[1]])
-#plt.show()
-
 ############ Data Scaling ###################
 
 sc = StandardScaler()
 X = sc.fit_transform(X)
-
 #X_test = sc.transform(X_test)
-print("--------"+str(len(X))+"---------")
-P = int(round(len(X)*0.8))
-X_train, X_test = X[:P],X[(P+1):]
-Y_train, Y_test = y[:P],y[(P+1):]
 
-np.savetxt('xtrain.txt',X_train)
-np.savetxt('xtest.txt',X_test)
-np.savetxt('ytrain.txt',Y_train)
-np.savetxt('ytest.txt',Y_test)
-miny = min(Y_train)
-maxy = max(Y_train)
+miny = min(y)
+maxy = max(y)
 
 
-y_norm = (Y_train - miny)/(maxy - miny)
+y_norm = (y - miny)/(maxy - miny)
 #y_norm
 
 #--IMPLEMENTACIÓN RED
@@ -156,30 +102,28 @@ y_norm = (Y_train - miny)/(maxy - miny)
 classifier = Sequential()
 
 # Adding the input layer and the first hidden layer
-classifier.add(Dense(units = 12,activation = 'relu', input_dim = 11))
-
+classifier.add(Dense(units = 10, kernel_initializer = 'uniform', activation = 'relu', input_dim = 14))
+#classifier.add(Flatten())
 # Adding the second hidden layer
-classifier.add(Dense(units = 6, activation = 'relu'))
+classifier.add(Dense(units = 5, kernel_initializer = 'uniform', activation = 'relu'))
 
 # Adding the output layer
-classifier.add(Dense(units = 1, activation = 'linear'))
+classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
 
 # Compiling the ANN
-classifier.compile(optimizer = 'adam', loss = 'mean_squared_error')
+classifier.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics = ['mae'])
 
-# Fitting the ANN to the training set
-classifier.fit(X_train, y_norm, batch_size = 10, epochs = 100)
+# Fitting the ANN to the train
+
+classifier.fit(X,y, batch_size = 10, epochs = 100)
 
 
 # Part 3 - Making the predictions and evaluating the model
 
 # Predicting the Test set results
 y_pred = classifier.predict(X_test)
-
-
-
 y_pred = (y_pred * (maxy - miny)) + miny
 
-np.savetxt("yout5.txt",y_pred)
+np.savetxt("ypred.txt",y_pred)
 
 predictions = np.array([int(elem) for elem in y_pred])
