@@ -93,9 +93,9 @@ y_normtrain = (y_train - miny)/(maxy - miny)
 def baseline_model():
 	classifier = Sequential()
 	# Adding the input layer and the first hidden layer
-	classifier.add(Dense(11, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+	classifier.add(Dense(10, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
 
-	classifier.add(Dense(6, kernel_initializer='uniform', activation='relu'))
+	classifier.add(Dense(5, kernel_initializer='uniform', activation='relu'))
 	# Adding the output layer
 	classifier.add(Dense(1, kernel_initializer = 'uniform',activation='sigmoid'))
 
@@ -110,7 +110,8 @@ from sklearn.model_selection import KFold
 
 estimator=KerasRegressor(build_fn=baseline_model,epochs=100,batch_size=10,verbose=0)
 
-kfold = KFold(n_splits=10)
+kfold = KFold(n_splits=3)
+
 results = cross_val_score(estimator, X_train, y_normtrain, cv=kfold)
 print("Baseline: %.2f (%.2f) MSE" % (results.mean(), results.std()))
 
@@ -130,10 +131,7 @@ print(prediction)
 preddesnorm = (prediction * (maxy - miny)) + miny
 print("pred desnorm=")
 print(preddesnorm)
-np.savetxt("ydesnorm.txt",preddesnorm)
-np.savetxt("ypred.txt",predictions)
 
-predictions = np.array([int(elem) for elem in preddesnorm])
 
 
 """
@@ -144,9 +142,14 @@ df_solution['ID'] = df_test.ID
 df_solution['electricity_consumption'] = predictions
 df_solution['electricity_consumption'].unique()
 
-#compare=df_train[['ID','Day','Month','Year','electricity_consumption']]
+#dia24=df_test.loc[(df_test['Year']==2013) & (df_test['Month']==7) & (df_test['Day']==24)]
 
-#compare.loc[(compare['Day']==1) & (compare['Month']==7) & (compare['Year']==2013)]
-#plt.plot(predictions)
-#plt.show()
-"""
+#dia24=dia24[['datetime','temperature','pressure','windspeed']]
+
+consumo24=preddesnorm[] indexo para coger las horas de el dia que quiero
+
+dia24['windspeed']=np.round(dia24['windspeed'].values)
+dia24['electric_consumption']=np.round(consumo24,2)
+
+dia24.to_csv('dia24conpred.csv',index=False,header=True)
+
