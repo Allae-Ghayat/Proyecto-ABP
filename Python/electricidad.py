@@ -97,7 +97,7 @@ y_normtrain = (y_train - miny)/(maxy - miny)
 def baseline_model():
 	classifier = Sequential()
 	# Adding the input layer and the first hidden layer
-	classifier.add(Dense(10, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+	classifier.add(Dense(11, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
 
 	classifier.add(Dense(5, kernel_initializer='uniform', activation='relu'))
 	# Adding the output layer
