@@ -1,8 +1,0 @@
-numpy
-pandas
-subprocess
-matplotlib
-datetime
-time
-operator
-keras
