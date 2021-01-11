@@ -13,6 +13,7 @@ def datetounix(df):
 #--import libraries
 
 import os
+import random
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,6 +40,8 @@ df_test = pd.read_csv("test.csv", encoding='ISO-8859-1', engine='c')
 #df_train.info()
 del(df_test['var1'])
 del(df_test['var2'])
+
+del(df_test['electricity_consumption']) 
 #--data cleaning
 
 df_train['datetime'] = pd.to_datetime(df_train['datetime'])
@@ -65,7 +68,8 @@ df_train['Quarter'] = [date.quarter for date in df_train.datetime]
 
 
 # Creating X_test
-X_test = datetounix(df_test).drop(['ID'], axis=1).values
+aux=df_test.copy()
+X_test = datetounix(aux).drop(['ID'], axis=1).values
 
 # Remove target column from the df
 df_train_features = df_train.drop(['electricity_consumption', 'ID'], axis=1)
@@ -110,14 +114,14 @@ from sklearn.model_selection import KFold
 
 estimator=KerasRegressor(build_fn=baseline_model,epochs=100,batch_size=10,verbose=0)
 
+#yes you can save model by estimator.model.save('model_name.h5'). And retrieve that model by load_model() method
+
 kfold = KFold(n_splits=3)
 
 results = cross_val_score(estimator, X_train, y_normtrain, cv=kfold)
 print("Baseline: %.2f (%.2f) MSE" % (results.mean(), results.std()))
-
+print("---Training finished---")
 # Part 3 - Making the predictions and evaluating the model
-
-# Predicting the Test set resultsy_pred = classifier.predict(X_test)
 
 estimator.fit(X_train, y_normtrain)
 prediction = estimator.predict(X_test)
@@ -133,23 +137,60 @@ print("pred desnorm=")
 print(preddesnorm)
 
 
+mybdtest=df_test.copy()
+mybdtest.insert(12,'electricity_consumption',np.round(preddesnorm,2))
+
+myfullbd=pd.concat([df_train,mybdtest],ignore_index=True)
+myfullbd.sort_values(by='datetime')
+
+
+
+fullbd=read_csv('fullbd.csv')
+
+
+fullrealconsums=fullbd['electricity_consumption'].values
+predconsums=myfullbd['electricity_consumption'].values
+
+#Con esto genero comparaciones graficas para ver como ha predecido 
+#los consumos de cada hora de los ultimos 7-8 dias de cada mes de este año
 
 """
-df_solution = pd.DataFrame()
-df_solution['ID'] = df_test.ID
+year=2015
 
-# Prepare Solution dataframe
-df_solution['electricity_consumption'] = predictions
-df_solution['electricity_consumption'].unique()
+for mes in range(1,13):
 
-#dia24=df_test.loc[(df_test['Year']==2013) & (df_test['Month']==7) & (df_test['Day']==24)]
+		realyear=fullbd.loc[(fullbd['Year']==year)  & (fullbd['Month']==mes) & (fullbd['Day']>23)  ]['electricity_consumption' ].values
+		predyear=myfullbd.loc[(myfullbd['Year']==year) & (fullbd['Month']==mes) & (myfullbd['Day'] > 23) ]['electricity_consumption'].values
 
-#dia24=dia24[['datetime','temperature','pressure','windspeed']]
+		if (len(realyear)>0) & (len(predyear)>0):
+			fig,ax=plt.subplots(2)
 
-consumo24=preddesnorm[] indexo para coger las horas de el dia que quiero
+			plt.subplots_adjust(hspace=0.4)
 
-dia24['windspeed']=np.round(dia24['windspeed'].values)
-dia24['electric_consumption']=np.round(consumo24,2)
+			ax[0].plot(realyear)
+			ax[0].set_title('Consumos de electricidad reales de %i, mes %i' % (year,mes))
+			ax[1].set_title('Consumos de electricidad predecidos de %i, mes %i' % (year,mes))
+			ax[1].plot(predyear)
+			plt.savefig('comp%i%i.png' % (year,mes))
+			plt.close("all")
+"""
 
-dia24.to_csv('dia24conpred.csv',index=False,header=True)
+#Para generar graficas anuales
+"""
+for year in range(2013,2018):
 
+		realyear=fullbd.loc[(fullbd['Year']==year) & (fullbd['Day']>23)  ]['electricity_consumption' ].values
+		predyear=myfullbd.loc[(myfullbd['Year']==year) & (myfullbd['Day'] > 23) ]['electricity_consumption'].values
+
+		if len(realyear)>0 and len(predyear)>0:
+			fig,ax=plt.subplots(2)
+
+			plt.subplots_adjust(hspace=0.4)
+
+			ax[0].plot(realyear)
+			ax[0].set_title('Consumos reales de %i' % year)
+			ax[1].set_title('Consumos predecidos de %i ' % year)
+			ax[1].plot(predyear)
+			plt.savefig('comp%i.png' % (year))
+			plt.close("all")
+"""
