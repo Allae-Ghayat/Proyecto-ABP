@@ -107,14 +107,15 @@ def baseline_model():
 	classifier.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 	return classifier
-# Fitting the ANN to the training set
+
+
 from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 
 estimator=KerasRegressor(build_fn=baseline_model,epochs=100,batch_size=10,verbose=0)
 
-#yes you can save model by estimator.model.save('model_name.h5'). And retrieve that model by load_model() method
+# Fitting the ANN to the training set
 
 kfold = KFold(n_splits=3)
 
