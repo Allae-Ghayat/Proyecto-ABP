@@ -120,7 +120,7 @@ estimator=KerasRegressor(build_fn=baseline_model,epochs=100,batch_size=10,verbos
 kfold = KFold(n_splits=3)
 
 results = cross_val_score(estimator, X_train, y_normtrain, cv=kfold)
-print("Baseline: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+#print("Baseline: %.2f (%.2f) MSE" % (results.mean(), results.std()))
 print("---Training finished---")
 # Part 3 - Making the predictions and evaluating the model
 
@@ -146,16 +146,16 @@ myfullbd.sort_values(by='datetime')
 
 
 
-fullbd=read_csv('fullbd.csv')
+fullbd=pd.read_csv('fullbd.csv')
 
 
 fullrealconsums=fullbd['electricity_consumption'].values
 predconsums=myfullbd['electricity_consumption'].values
 
-#Con esto genero comparaciones graficas para ver como ha predecido 
+#Con esto genero comparaciones graficas para ver como ha predicho
 #los consumos de cada hora de los ultimos 7-8 dias de cada mes de este año
 
-"""
+
 year=2015
 
 for mes in range(1,13):
@@ -170,14 +170,14 @@ for mes in range(1,13):
 
 			ax[0].plot(realyear)
 			ax[0].set_title('Consumos de electricidad reales de %i, mes %i' % (year,mes))
-			ax[1].set_title('Consumos de electricidad predecidos de %i, mes %i' % (year,mes))
+			ax[1].set_title('Consumos de electricidad predichos de %i, mes %i' % (year,mes))
 			ax[1].plot(predyear)
 			plt.savefig('comp%i%i.png' % (year,mes))
 			plt.close("all")
-"""
+
 
 #Para generar graficas anuales
-"""
+
 for year in range(2013,2018):
 
 		realyear=fullbd.loc[(fullbd['Year']==year) & (fullbd['Day']>23)  ]['electricity_consumption' ].values
@@ -190,8 +190,8 @@ for year in range(2013,2018):
 
 			ax[0].plot(realyear)
 			ax[0].set_title('Consumos reales de %i' % year)
-			ax[1].set_title('Consumos predecidos de %i ' % year)
+			ax[1].set_title('Consumos predichos de %i ' % year)
 			ax[1].plot(predyear)
 			plt.savefig('comp%i.png' % (year))
 			plt.close("all")
-"""
+

@@ -5,6 +5,12 @@ Las bibliotecas necesarias para la ejecución de los códigos se encuentran en e
 
 - Predicción consumo de electricidad
 
+Una vez estén las librerias instaladas, tan solo haciendo python electricidad.py, 
+la red procederá a realizar el entrenamiento y luego a predecir con los datos de test.
+En todo lo anterior la ejecución tarda varios minutos.
+Finalmente se generarán gráficas donde se podrán comparar los consumos reales de los días de test.csv con con nuestras predicciones.
+Estas gráficas por una parte serán de cada mes de 2015 para mejor apreciación de las diferencias y además
+generamos una gráfica de cada año.
 
 
 - Segmentación de clientes
